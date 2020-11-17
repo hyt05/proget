@@ -1,0 +1,69 @@
+# Default values for proget.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: proget.inedo.com/productimages/inedo/proget
+  tag: 5.3.16
+  pullPolicy: IfNotPresent
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 80
+
+extraEnv: {
+  "SQL_CONNECTION_STRING":"Data Source=sqlserver-mssql-linux; Initial Catalog=ProGet; User ID=sa; Password=Abc@1234"
+}
+
+ingress:
+  enabled: false
+  annotations: {}
+#    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+  hosts:
+    - host: proget.yhglobal.cn
+      paths: [/]
+  tls: []
+#    - secretName: proget-yhglobal-cn-tls
+#      hosts:
+#        - '*.yhglobal.cn'
+   
+volume:
+  enabled: true
+  extraHostPathMounts:
+    - name: timezone
+      mountPath: /etc/localtime
+      readOnly: true
+      hostPath: /etc/localtime
+        
+persistence:
+  enabled: true
+  storageClass: "rook-ceph-block"
+  accessMode: ReadWriteOnce
+  size: 20Gi
+  packages: /var/proget/packages
+  subPath: "proget"
+
+resources:
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  limits:
+    cpu: 150m
+    memory: 1Gi
+  requests:
+    cpu: 150m
+    memory: 1Gi
+
+nodeSelector: {}
+
+
+tolerations: []
+
+affinity: {}
